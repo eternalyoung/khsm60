@@ -13,8 +13,12 @@ RSpec.describe GameQuestion, type: :model do
     end
 
     it 'correct .answer_correct?' do
-      # именно под буквой b в тесте мы спрятали указатель на верный ответ
       expect(game_question.answer_correct?('b')).to be_truthy
+    end
+
+    it 'correct .level & .text delegates' do
+      expect(game_question.text).to eq(game_question.question.text)
+      expect(game_question.level).to  eq(game_question.question.level)
     end
   end
 
@@ -28,13 +32,6 @@ RSpec.describe GameQuestion, type: :model do
 
       ah = game_question.help_hash[:audience_help]
       expect(ah.keys).to contain_exactly('a', 'b', 'c', 'd')
-    end
-  end
-
-  context 'methods' do
-    it 'correct .level & .text delegates' do
-      expect(game_question.text).to eq(game_question.question.text)
-      expect(game_question.level).to  eq(game_question.question.level)
     end
   end
 end

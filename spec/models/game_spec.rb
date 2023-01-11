@@ -1,11 +1,6 @@
-# (c) goodprogrammer.ru
-
 require 'rails_helper'
-require 'support/my_spec_helper' # наш собственный класс с вспомогательными методами
+require 'support/my_spec_helper'
 
-# Тестовый сценарий для модели Игры
-# В идеале - все методы должны быть покрыты тестами,
-# в этом классе содержится ключевая логика игры и значит работы сайта.
 RSpec.describe Game, type: :model do
   # пользователь для создания игр
   let(:user) { FactoryGirl.create(:user) }
@@ -38,10 +33,8 @@ RSpec.describe Game, type: :model do
     end
   end
 
-
   # тесты на основную игровую логику
   context 'game mechanics' do
-
     # правильный ответ должен продолжать игру
     it 'answer correct continues game' do
       # текущий уровень игры и статус
@@ -59,6 +52,57 @@ RSpec.describe Game, type: :model do
       # игра продолжается
       expect(game_w_questions.status).to eq(:in_progress)
       expect(game_w_questions.finished?).to be_falsey
+    end
+
+    it '#take_money!' do
+      # берем игру и отвечаем на текущий вопрос
+      q = game_w_questions.current_game_question
+      game_w_questions.answer_current_question!(q.correct_answer_key)
+
+      # взяли деньги
+      game_w_questions.take_money!
+
+      prize = game_w_questions.prize
+      expect(prize).to be > 0
+
+      # проверяем что закончилась игра и пришли деньги игроку
+      expect(game_w_questions.status).to eq :money
+      expect(game_w_questions.finished?).to be_truthy
+      expect(user.balance).to eq prize
+    end
+  end
+
+  context '#status' do
+    it 'status returns :in_progress correctly' do
+      expect(game_w_questions.status).to eq :in_progress
+    end
+
+    context 'finished #status' do
+      before(:each) do
+        game_w_questions.finished_at = Time.now
+        expect(game_w_questions.finished?).to be_truthy
+      end
+
+      it 'status returns :fail correctly' do
+        game_w_questions.is_failed = true
+        expect(game_w_questions.status).to eq :fail
+      end
+
+      it 'status returns :timeout correctly' do
+        game_w_questions.finished_at += Game::TIME_LIMIT
+        game_w_questions.is_failed = true
+        expect(game_w_questions.status).to eq :timeout
+      end
+
+      it 'status returns :won correctly' do
+        game_w_questions.current_level = Question::QUESTION_LEVELS.max + 1
+        expect(game_w_questions.status).to eq :won
+      end
+
+      it 'status returns :money correctly' do
+        game_w_questions.take_money!
+        expect(game_w_questions.status).to eq :money
+      end
     end
   end
 end
