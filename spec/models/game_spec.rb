@@ -73,33 +73,33 @@ RSpec.describe Game, type: :model do
   end
 
   context '#status' do
-    it 'status returns :in_progress correctly' do
+    it 'returns :in_progress correctly' do
       expect(game_w_questions.status).to eq :in_progress
     end
 
-    context 'finished #status' do
+    context 'finished' do
       before(:each) do
         game_w_questions.finished_at = Time.now
         expect(game_w_questions.finished?).to be_truthy
       end
 
-      it 'status returns :fail correctly' do
+      it 'returns :fail correctly' do
         game_w_questions.is_failed = true
         expect(game_w_questions.status).to eq :fail
       end
 
-      it 'status returns :timeout correctly' do
+      it 'returns :timeout correctly' do
         game_w_questions.finished_at += Game::TIME_LIMIT
         game_w_questions.is_failed = true
         expect(game_w_questions.status).to eq :timeout
       end
 
-      it 'status returns :won correctly' do
+      it 'returns :won correctly' do
         game_w_questions.current_level = Question::QUESTION_LEVELS.max + 1
         expect(game_w_questions.status).to eq :won
       end
 
-      it 'status returns :money correctly' do
+      it 'returns :money correctly' do
         game_w_questions.take_money!
         expect(game_w_questions.status).to eq :money
       end
