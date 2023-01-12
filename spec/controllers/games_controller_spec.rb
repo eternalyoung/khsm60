@@ -253,7 +253,7 @@ RSpec.describe GamesController, type: :controller do
           expect(game.finished?).to eq(true)
         end
 
-        it 'should finish game' do
+        it 'should not level up game level' do
           game = assigns(:game)
           expect(game.current_level).to be 0
         end
