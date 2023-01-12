@@ -106,7 +106,7 @@ describe Game, type: :model do
     end
   end
 
-  context '#current_game_question' do
+  describe '#current_game_question' do
     it 'returns current game question' do
       14.times do |level|
         expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[level])
@@ -115,7 +115,7 @@ describe Game, type: :model do
     end
   end
 
-  context '#previous_level' do
+  describe '#previous_level' do
     it 'returns previous level' do
       13.times do |level|
         game_w_questions.current_level += 1
@@ -125,7 +125,6 @@ describe Game, type: :model do
   end
 
   describe '#answer_current_question!' do
-    let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
     context 'given incorrect answer' do
       it 'should return false' do
         expect(game_w_questions.answer_current_question!('c')).to eq(false)
