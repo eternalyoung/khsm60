@@ -126,10 +126,18 @@ describe Game, type: :model do
 
   describe '#answer_current_question!' do
     let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
-    
     context 'given incorrect answer' do
       it 'should return false' do
         expect(game_w_questions.answer_current_question!('c')).to eq(false)
+      end
+      it 'should finish game' do
+        game_w_questions.answer_current_question!('c')
+        expect(game_w_questions.finished?).to eq(true)
+      end
+
+      it 'should fail game' do
+        game_w_questions.answer_current_question!('c')
+        expect(game_w_questions.is_failed).to eq(true)
       end
     end
 
@@ -138,10 +146,29 @@ describe Game, type: :model do
         expect(game_w_questions.answer_current_question!('d')).to eq(true)
       end
 
+      it 'should level up by 1' do
+        level = game_w_questions.current_level
+        game_w_questions.answer_current_question!('d')
+        expect(game_w_questions.current_level).to eq(level + 1)
+      end
+
       context 'on last question' do
-        it 'should return true' do
+        before(:each) do
           game_w_questions.current_level = Question::QUESTION_LEVELS.max
+        end
+
+        it 'should return true' do
           expect(game_w_questions.answer_current_question!('d')).to eq(true)
+        end
+        
+        it 'should finish game' do
+          game_w_questions.answer_current_question!('d')
+          expect(game_w_questions.finished?).to eq(true)
+        end
+
+        it 'should not fail game' do
+          game_w_questions.answer_current_question!('d')
+          expect(game_w_questions.is_failed).to eq(false)
         end
       end
 
