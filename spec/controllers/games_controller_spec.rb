@@ -112,8 +112,7 @@ RSpec.describe GamesController, type: :controller do
 
   # группа тестов на экшены контроллера, доступных залогиненным юзерам
   context 'Usual user' do
-    # перед каждым тестом в группе
-    before(:each) { sign_in user } # логиним юзера user с помощью спец. Devise метода sign_in
+    before(:each) { sign_in user }
 
     # юзер может создать новую игру
     it 'creates game' do
@@ -234,6 +233,33 @@ RSpec.describe GamesController, type: :controller do
 
         it 'should redirect to not finished game page' do
           expect(response).to redirect_to(game_path(game_w_questions))
+        end
+
+        it 'should have alert flash' do
+          expect(flash[:alert]).to be
+        end
+      end
+    end
+
+    describe 'PUT answer' do
+      context "with incorrect answer" do
+        before(:each) do
+          game_w_questions
+          put :answer, id: game_w_questions.id, letter: 'a'
+        end
+
+        it 'should finish game' do
+          game = assigns(:game)
+          expect(game.finished?).to eq(true)
+        end
+
+        it 'should finish game' do
+          game = assigns(:game)
+          expect(game.current_level).to be 0
+        end
+
+        it 'should redirect to user page' do
+          expect(response).to redirect_to(user_path(user.id))
         end
 
         it 'should have alert flash' do
