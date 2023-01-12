@@ -123,4 +123,30 @@ RSpec.describe Game, type: :model do
       end
     end
   end
+
+  context '#answer_current_question!' do
+    it 'answer correct' do
+      level = game_w_questions.current_level
+      expect(game_w_questions.answer_current_question!('d')).to be_truthy
+      expect(game_w_questions.current_level).to eq(level + 1)
+    end
+
+    it 'answer not correct' do
+      expect(game_w_questions.answer_current_question!('c')).to be_falsey
+      expect(game_w_questions.finished?).to be_truthy
+      expect(game_w_questions.status).to eq(:fail)
+    end
+
+    it 'answer won' do
+      game_w_questions.current_level = Question::QUESTION_LEVELS.max
+      expect(game_w_questions.answer_current_question!('d')).to be_truthy
+      expect(game_w_questions.status).to eq(:won)
+    end
+
+    it 'answer time_out' do
+      game_w_questions.created_at -= Game::TIME_LIMIT
+      expect(game_w_questions.answer_current_question!('d')).to be_falsey
+      expect(game_w_questions.status).to eq(:timeout)
+    end
+  end
 end
