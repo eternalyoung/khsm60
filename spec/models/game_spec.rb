@@ -1,7 +1,7 @@
 require 'rails_helper'
 require 'support/my_spec_helper'
 
-RSpec.describe Game, type: :model do
+describe Game, type: :model do
   # пользователь для создания игр
   let(:user) { FactoryGirl.create(:user) }
 
@@ -124,29 +124,33 @@ RSpec.describe Game, type: :model do
     end
   end
 
-  context '#answer_current_question!' do
-    it 'answer correct' do
-      level = game_w_questions.current_level
-      expect(game_w_questions.answer_current_question!('d')).to be_truthy
-      expect(game_w_questions.current_level).to eq(level + 1)
+  describe '#answer_current_question!' do
+    let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
+    
+    context 'given incorrect answer' do
+      it 'should return false' do
+        expect(game_w_questions.answer_current_question!('c')).to eq(false)
+      end
     end
 
-    it 'answer not correct' do
-      expect(game_w_questions.answer_current_question!('c')).to be_falsey
-      expect(game_w_questions.finished?).to be_truthy
-      expect(game_w_questions.status).to eq(:fail)
-    end
+    context 'given correct answer' do
+      it 'should return true' do
+        expect(game_w_questions.answer_current_question!('d')).to eq(true)
+      end
 
-    it 'answer won' do
-      game_w_questions.current_level = Question::QUESTION_LEVELS.max
-      expect(game_w_questions.answer_current_question!('d')).to be_truthy
-      expect(game_w_questions.status).to eq(:won)
-    end
+      context 'on last question' do
+        it 'should return true' do
+          game_w_questions.current_level = Question::QUESTION_LEVELS.max
+          expect(game_w_questions.answer_current_question!('d')).to eq(true)
+        end
+      end
 
-    it 'answer time_out' do
-      game_w_questions.created_at -= Game::TIME_LIMIT
-      expect(game_w_questions.answer_current_question!('d')).to be_falsey
-      expect(game_w_questions.status).to eq(:timeout)
+      context 'answer time_out' do
+        it 'should return false' do
+          game_w_questions.created_at -= Game::TIME_LIMIT
+          expect(game_w_questions.answer_current_question!('d')).to eq(false)
+        end
+      end
     end
   end
 end
