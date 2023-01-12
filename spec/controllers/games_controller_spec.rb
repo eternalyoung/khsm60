@@ -19,14 +19,94 @@ RSpec.describe GamesController, type: :controller do
 
   # группа тестов для незалогиненного юзера (Анонимус)
   context 'Anon' do
-    # из экшена show анона посылаем
-    it 'kick from #show' do
-      # вызываем экшен
-      get :show, id: game_w_questions.id
-      # проверяем ответ
-      expect(response.status).not_to eq(200) # статус не 200 ОК
-      expect(response).to redirect_to(new_user_session_path) # devise должен отправить на логин
-      expect(flash[:alert]).to be # во flash должен быть прописана ошибка
+    describe 'GET show' do
+      before(:each) do
+        get :show, id: game_w_questions.id
+      end
+
+      it 'response status should not be 200' do
+        expect(response.status).not_to eq(200)
+      end
+
+      it 'should redirect to login page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'should have alert flash' do
+        expect(flash[:alert]).to be
+      end
+    end
+
+    describe 'POST create' do
+      before(:each) do
+        post :create
+      end
+
+      it 'response status should not be 200' do
+        expect(response.status).not_to eq(200)
+      end
+
+      it 'should redirect to login page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'should have alert flash' do
+        expect(flash[:alert]).to be
+      end
+    end
+
+    describe 'PUT take_money' do
+      before(:each) do
+        put :take_money, id: game_w_questions.id
+      end
+
+      it 'response status should not be 200' do
+        expect(response.status).not_to eq(200)
+      end
+
+      it 'should redirect to login page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'should have alert flash' do
+        expect(flash[:alert]).to be
+      end
+    end
+
+    describe 'PUT answer' do
+      before(:each) do
+        put :answer, id: game_w_questions.id
+      end
+
+      it 'response status should not be 200' do
+        expect(response.status).not_to eq(200)
+      end
+
+      it 'should redirect to login page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'should have alert flash' do
+        expect(flash[:alert]).to be
+      end
+    end
+
+    describe 'PUT help' do
+      before(:each) do
+        put :help, id: game_w_questions.id
+      end
+
+      it 'response status should not be 200' do
+        expect(response.status).not_to eq(200)
+      end
+
+      it 'should redirect to login page' do
+        expect(response).to redirect_to(new_user_session_path)
+      end
+
+      it 'should have alert flash' do
+        expect(flash[:alert]).to be
+      end
     end
   end
 
@@ -90,6 +170,76 @@ RSpec.describe GamesController, type: :controller do
       expect(game.current_game_question.help_hash[:audience_help]).to be
       expect(game.current_game_question.help_hash[:audience_help].keys).to contain_exactly('a', 'b', 'c', 'd')
       expect(response).to redirect_to(game_path(game))
+    end
+
+    describe 'GET show' do
+      context "alien game" do
+        before(:each) do
+          alien_game = FactoryGirl.create(:game_with_questions)
+          get :show, id: alien_game.id
+        end
+
+        it 'response status should not be 200' do
+          expect(response.status).not_to eq(200)
+        end
+
+        it 'should redirect to index page' do
+          expect(response).to redirect_to(root_path)
+        end
+
+        it 'should have alert flash' do
+          expect(flash[:alert]).to be
+        end
+      end
+    end
+
+    describe 'PUT take_money' do
+      context 'with prize above zero' do
+        before(:each) do
+          game_w_questions.update_attribute(:current_level, 2)
+          put :take_money, id: game_w_questions.id
+        end
+        it 'game should be finished' do
+          game = assigns(:game)
+          expect(game.finished?).to be_truthy
+        end
+        it 'game prize should be correct' do
+          game = assigns(:game)
+          expect(game.prize).to eq(200)
+        end
+        it 'user balance should up correct' do
+          user.reload
+          expect(user.balance).to eq(200)
+        end
+        it 'should redirect to user page' do
+          expect(response).to redirect_to(user_path(user))
+        end
+        it 'should have warning flash' do
+          expect(flash[:warning]).to be
+        end
+      end
+    end
+
+    describe 'POST create' do
+      context "with not finished game" do
+        before(:each) do
+          game_w_questions
+          post :create
+        end
+
+        it 'should not create new game' do
+          game = assigns(:game)
+          expect(game).to be_nil
+        end
+
+        it 'should redirect to not finished game page' do
+          expect(response).to redirect_to(game_path(game_w_questions))
+        end
+
+        it 'should have alert flash' do
+          expect(flash[:alert]).to be
+        end
+      end
     end
   end
 end
