@@ -20,91 +20,81 @@ RSpec.describe GamesController, type: :controller do
   # группа тестов для незалогиненного юзера (Анонимус)
   context 'Anon' do
     describe 'GET show' do
-      before(:each) do
-        get :show, id: game_w_questions.id
-      end
+      before { get :show, id: game_w_questions.id }
 
-      it 'response status should not be 200' do
+      it 'response status not 200' do
         expect(response.status).not_to eq(200)
       end
 
-      it 'should redirect to login page' do
+      it 'redirects to login page' do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'should have alert flash' do
+      it 'shows alert flash' do
         expect(flash[:alert]).to be
       end
     end
 
     describe 'POST create' do
-      before(:each) do
-        post :create
-      end
+      before { post :create }
 
-      it 'response status should not be 200' do
+      it 'response status isnt 200' do
         expect(response.status).not_to eq(200)
       end
 
-      it 'should redirect to login page' do
+      it 'redirects to login page' do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'should have alert flash' do
+      it 'shows alert flash' do
         expect(flash[:alert]).to be
       end
     end
 
     describe 'PUT take_money' do
-      before(:each) do
-        put :take_money, id: game_w_questions.id
-      end
+      before { put :take_money, id: game_w_questions.id }
 
-      it 'response status should not be 200' do
+      it 'response status isnt 200' do
         expect(response.status).not_to eq(200)
       end
 
-      it 'should redirect to login page' do
+      it 'redirects to login page' do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'should have alert flash' do
+      it 'shows alert flash' do
         expect(flash[:alert]).to be
       end
     end
 
     describe 'PUT answer' do
-      before(:each) do
-        put :answer, id: game_w_questions.id
-      end
+      before { put :answer, id: game_w_questions.id }
 
-      it 'response status should not be 200' do
+      it 'response status isnt 200' do
         expect(response.status).not_to eq(200)
       end
 
-      it 'should redirect to login page' do
+      it 'redirects to login page' do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'should have alert flash' do
+      it 'shows alert flash' do
         expect(flash[:alert]).to be
       end
     end
 
     describe 'PUT help' do
-      before(:each) do
-        put :help, id: game_w_questions.id
-      end
+      before { put :help, id: game_w_questions.id }
 
-      it 'response status should not be 200' do
+      it 'response status isnt 200' do
         expect(response.status).not_to eq(200)
       end
 
-      it 'should redirect to login page' do
+      it 'redirects to login page' do
         expect(response).to redirect_to(new_user_session_path)
       end
 
-      it 'should have alert flash' do
+      it 'shows alert flash' do
         expect(flash[:alert]).to be
       end
     end
@@ -112,7 +102,7 @@ RSpec.describe GamesController, type: :controller do
 
   # группа тестов на экшены контроллера, доступных залогиненным юзерам
   context 'Usual user' do
-    before(:each) { sign_in user }
+    before { sign_in user }
 
     # юзер может создать новую игру
     it 'creates game' do
@@ -173,20 +163,20 @@ RSpec.describe GamesController, type: :controller do
 
     describe 'GET show' do
       context "alien game" do
-        before(:each) do
+        before do
           alien_game = FactoryGirl.create(:game_with_questions)
           get :show, id: alien_game.id
         end
 
-        it 'response status should not be 200' do
+        it 'response status isnt 200' do
           expect(response.status).not_to eq(200)
         end
 
-        it 'should redirect to index page' do
+        it 'redirects to index page' do
           expect(response).to redirect_to(root_path)
         end
 
-        it 'should have alert flash' do
+        it 'shows alert flash' do
           expect(flash[:alert]).to be
         end
       end
@@ -194,26 +184,26 @@ RSpec.describe GamesController, type: :controller do
 
     describe 'PUT take_money' do
       context 'with prize above zero' do
-        before(:each) do
+        before do
           game_w_questions.update_attribute(:current_level, 2)
           put :take_money, id: game_w_questions.id
         end
-        it 'game should be finished' do
+        it 'game ends' do
           game = assigns(:game)
           expect(game.finished?).to be_truthy
         end
-        it 'game prize should be correct' do
+        it 'game prize is correct' do
           game = assigns(:game)
           expect(game.prize).to eq(200)
         end
-        it 'user balance should up correct' do
+        it 'user balance is up correct' do
           user.reload
           expect(user.balance).to eq(200)
         end
-        it 'should redirect to user page' do
+        it 'redirects to user page' do
           expect(response).to redirect_to(user_path(user))
         end
-        it 'should have warning flash' do
+        it 'shows warning flash' do
           expect(flash[:warning]).to be
         end
       end
@@ -221,21 +211,21 @@ RSpec.describe GamesController, type: :controller do
 
     describe 'POST create' do
       context "with not finished game" do
-        before(:each) do
+        before do
           game_w_questions
           post :create
         end
 
-        it 'should not create new game' do
+        it 'doesnt create a new game' do
           game = assigns(:game)
           expect(game).to be_nil
         end
 
-        it 'should redirect to not finished game page' do
+        it 'redirects to not finished game page' do
           expect(response).to redirect_to(game_path(game_w_questions))
         end
 
-        it 'should have alert flash' do
+        it 'shows alert flash' do
           expect(flash[:alert]).to be
         end
       end
@@ -243,26 +233,26 @@ RSpec.describe GamesController, type: :controller do
 
     describe 'PUT answer' do
       context "with incorrect answer" do
-        before(:each) do
+        before do
           game_w_questions
           put :answer, id: game_w_questions.id, letter: 'a'
         end
 
-        it 'should finish game' do
+        it 'finishы game' do
           game = assigns(:game)
           expect(game.finished?).to eq(true)
         end
 
-        it 'should not level up game level' do
+        it 'doesnt level up game level' do
           game = assigns(:game)
           expect(game.current_level).to be 0
         end
 
-        it 'should redirect to user page' do
+        it 'redirects to user page' do
           expect(response).to redirect_to(user_path(user.id))
         end
 
-        it 'should have alert flash' do
+        it 'shows alert flash' do
           expect(flash[:alert]).to be
         end
       end
