@@ -257,5 +257,38 @@ RSpec.describe GamesController, type: :controller do
         end
       end
     end
+    
+    describe "PUT help" do
+      context "fifty_fifty" do
+        before do
+          game_w_questions
+          put :help, id: game_w_questions.id, help_type: :fifty_fifty
+        end
+
+        context "first use" do
+          it 'redirects to game page' do
+            expect(response).to redirect_to(game_path(game_w_questions))
+          end
+  
+          it 'shows info flash' do
+            expect(flash[:info]).to be
+          end
+        end
+
+        context "not first use" do
+          before do
+            put :help, id: game_w_questions.id, help_type: :fifty_fifty
+          end
+
+          it 'redirects to game page' do
+            expect(response).to redirect_to(game_path(game_w_questions))
+          end
+  
+          it 'shows alert flash' do
+            expect(flash[:alert]).to be
+          end
+        end
+      end      
+    end
   end
 end
