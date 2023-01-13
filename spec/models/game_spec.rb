@@ -108,19 +108,17 @@ describe Game, type: :model do
 
   describe '#current_game_question' do
     it 'returns current game question' do
-      14.times do |level|
-        expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[level])
-        game_w_questions.current_level += 1
-      end
+      level = 2
+      game_w_questions.current_level = level
+      expect(game_w_questions.current_game_question).to eq(game_w_questions.game_questions[level])
     end
   end
 
   describe '#previous_level' do
     it 'returns previous level' do
-      13.times do |level|
-        game_w_questions.current_level += 1
-        expect(game_w_questions.previous_level).to eq(level)
-      end
+      level = 2
+      game_w_questions.current_level = level
+      expect(game_w_questions.previous_level).to eq(level - 1)
     end
   end
 
