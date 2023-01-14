@@ -123,56 +123,53 @@ describe Game, type: :model do
   end
 
   describe '#answer_current_question!' do
-    context 'given incorrect answer' do
-      it 'should return false' do
-        expect(game_w_questions.answer_current_question!('c')).to eq(false)
-      end
-      it 'should finish game' do
-        game_w_questions.answer_current_question!('c')
+    before { game_w_questions.answer_current_question!(answer_key) }
+    context 'when answer is wrong' do
+      let!(:answer_key) { (['a','b','c','d'] - [game_w_questions.current_game_question.correct_answer_key]).sample }
+      it 'finishes the game' do
         expect(game_w_questions.finished?).to eq(true)
       end
 
-      it 'should fail game' do
-        game_w_questions.answer_current_question!('c')
-        expect(game_w_questions.is_failed).to eq(true)
+      it 'finishes with status fail' do
+          expect(game_w_questions.status).to eq(:fail)
       end
     end
 
-    context 'given correct answer' do
-      it 'should return true' do
-        expect(game_w_questions.answer_current_question!('d')).to eq(true)
-      end
+    context 'when answer is correct' do
+      let!(:level) { 0 }
+      let!(:answer_key) { game_w_questions.current_game_question.correct_answer_key }
 
-      it 'should level up by 1' do
-        level = game_w_questions.current_level
-        game_w_questions.answer_current_question!('d')
-        expect(game_w_questions.current_level).to eq(level + 1)
-      end
+      context 'and question is last' do
+        let!(:level) { Question::QUESTION_LEVELS.max }
+        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user, current_level: level) }
 
-      context 'on last question' do
-        before(:each) do
-          game_w_questions.current_level = Question::QUESTION_LEVELS.max
-        end
-
-        it 'should return true' do
-          expect(game_w_questions.answer_current_question!('d')).to eq(true)
-        end
-        
-        it 'should finish game' do
-          game_w_questions.answer_current_question!('d')
+        it 'finishes the game' do
           expect(game_w_questions.finished?).to eq(true)
         end
 
-        it 'should not fail game' do
-          game_w_questions.answer_current_question!('d')
-          expect(game_w_questions.is_failed).to eq(false)
+        it 'finishes with status won' do
+          expect(game_w_questions.status).to eq(:won)
         end
       end
 
-      context 'answer time_out' do
-        it 'should return false' do
-          game_w_questions.created_at -= Game::TIME_LIMIT
-          expect(game_w_questions.answer_current_question!('d')).to eq(false)
+      context 'and question is not last' do
+        it 'moves to next level' do
+          expect(game_w_questions.current_level).to eq(level + 1)
+        end
+        it 'continues game' do
+          expect(game_w_questions.finished?).to eq(false)
+        end
+      end
+      
+      context 'and time is over' do
+        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user, created_at: Time.now - Game::TIME_LIMIT) }
+
+        it 'finishes the game' do
+          expect(game_w_questions.finished?).to eq(true)
+        end
+
+        it 'finishes with status timeout' do
+          expect(game_w_questions.status).to eq(:timeout)
         end
       end
     end
