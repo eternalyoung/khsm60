@@ -156,6 +156,7 @@ describe Game, type: :model do
         it 'moves to next level' do
           expect(game_w_questions.current_level).to eq(level + 1)
         end
+
         it 'continues game' do
           expect(game_w_questions.finished?).to eq(false)
         end
