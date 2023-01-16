@@ -118,7 +118,7 @@ describe Game, type: :model do
     it 'returns previous level' do
       level = 2
       game_w_questions.current_level = level
-      expect(game_w_questions.previous_level).to eq(level - 1)
+      expect(game_w_questions.previous_level).to eq(1)
     end
   end
 
