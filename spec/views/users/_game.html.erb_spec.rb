@@ -8,7 +8,8 @@ RSpec.describe 'users/_game', type: :view do
   # обратите внимание, что build_stubbed не создает объект в базе, будьте аккуратнее
   let(:game) do
     FactoryGirl.build_stubbed(
-      :game, id: 15, created_at: Time.parse('2016.10.09, 13:00'), current_level: 10, prize: 1000
+      # created_at при записи в базу переводится во время по МСК, то есть от меня это -4 часа 17:00 у меня = 13:00 по МСК
+      :game, id: 15, created_at: Time.parse('2016.10.09, 17:00'), current_level: 10, prize: 1000
     )
   end
 
