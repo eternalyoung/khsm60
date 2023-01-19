@@ -7,7 +7,7 @@ describe 'users/show.html.erb', type: :view do
     stub_template 'users/_game.html.erb' => 'User game goes here'
     render
   end
-  let(:user) { FactoryBot.create(:user, name: 'Вадик') }
+  let(:user) { create(:user, name: 'Вадик') }
  
   it "renders user name" do
     expect(rendered).to match 'Вадик'
