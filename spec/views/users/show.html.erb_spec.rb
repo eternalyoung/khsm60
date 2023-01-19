@@ -3,11 +3,11 @@ require 'rails_helper'
 describe 'users/show.html.erb', type: :view do
   before do
     assign(:user, user)
-    assign(:games, [FactoryGirl.build_stubbed(:game)])
+    assign(:games, [FactoryBot.build_stubbed(:game)])
     stub_template 'users/_game.html.erb' => 'User game goes here'
     render
   end
-  let(:user) { FactoryGirl.create(:user, name: 'Вадик') }
+  let(:user) { FactoryBot.create(:user, name: 'Вадик') }
  
   it "renders user name" do
     expect(rendered).to match 'Вадик'

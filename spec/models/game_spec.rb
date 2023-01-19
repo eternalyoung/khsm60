@@ -3,10 +3,10 @@ require 'support/my_spec_helper'
 
 describe Game, type: :model do
   # пользователь для создания игр
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   # игра с прописанными игровыми вопросами
-  let(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user) }
+  let(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user) }
 
   # Группа тестов на работу фабрики создания новых игр
   context 'Game Factory' do
@@ -141,7 +141,7 @@ describe Game, type: :model do
 
       context 'and question is last' do
         let!(:level) { Question::QUESTION_LEVELS.max }
-        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user, current_level: level) }
+        let!(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user, current_level: level) }
 
         it 'finishes the game' do
           expect(game_w_questions.finished?).to eq(true)
@@ -163,7 +163,7 @@ describe Game, type: :model do
       end
       
       context 'and time is over' do
-        let!(:game_w_questions) { FactoryGirl.create(:game_with_questions, user: user, created_at: Time.now - Game::TIME_LIMIT) }
+        let!(:game_w_questions) { FactoryBot.create(:game_with_questions, user: user, created_at: Time.now - Game::TIME_LIMIT) }
 
         it 'finishes the game' do
           expect(game_w_questions.finished?).to eq(true)

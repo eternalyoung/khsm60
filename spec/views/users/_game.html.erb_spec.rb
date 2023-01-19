@@ -7,7 +7,7 @@ RSpec.describe 'users/_game', type: :view do
   # Подготовим объект game для использования в тестах, где он понадобится
   # обратите внимание, что build_stubbed не создает объект в базе, будьте аккуратнее
   let(:game) do
-    FactoryGirl.build_stubbed(
+    FactoryBot.build_stubbed(
       # created_at при записи в базу переводится во время по МСК, то есть от меня это -4 часа 17:00 у меня = 13:00 по МСК
       :game, id: 15, created_at: Time.parse('2016.10.09, 17:00'), current_level: 10, prize: 1000
     )
